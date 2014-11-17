@@ -1,3 +1,5 @@
+require 'yaml'
+
 class Tile
    def initialize
       @value = "*"
@@ -5,6 +7,10 @@ class Tile
 
    def set(value)
      @value = value
+   end
+
+   def flag
+     set("F")
    end
 
    attr_reader :value
@@ -94,7 +100,7 @@ class Board
     def bomb_here?(coords)
       @bomb_positions.include?(coords)
     end
-    attr_reader :bomb_positions
+    attr_reader :bomb_positions, :size
 
     def [](co)
       @board[co.first][co.last]
@@ -104,12 +110,20 @@ class Board
       @remaining_tiles == @bomb_positions.count
     end
 
+    def flag_tile(coords)
+      self[coords].flag
+    end
+
 end
 
 class Game
     def initialize(size= 9, bombs= 3)
-      @gameboard = Board.new(size,bombs)
-      @size = size
+      if ARGV.empty?
+        @gameboard = Board.new(size,bombs)
+      else
+        yaml_str = File.read(ARGV.last).to_s
+        @gameboard = YAML::load(yaml_str)
+      end
     end
 
     attr_reader :gameboard
@@ -117,12 +131,21 @@ class Game
     def run
         until @gameboard.win?
           @gameboard.display
-          puts "Please select a tile in the format [0..#{@size-1},0..#{@size-1}]"
-          input = get_move
-          puts "Reveal or flag?(r/f)"
+          puts "Reveal, flag, or save?(r/f/s)"
           type = gets.chomp
-          break if @gameboard.reveal_tile(input).nil?
+          puts "Please select a tile in the format
+          [0..#{@gameboard.size-1},0..#{@gameboard.size-1}]" unless type == "s"
+          input = get_move unless type == "s"
+          if type == "r"
+            break if @gameboard.reveal_tile(input).nil?
+          elsif type == 'f'
+            @gameboard.flag_tile(input)
+          else
+            save_game
+            return false
+          end
         end
+        @gameboard.display
         return "YOU WIN!!!" if @gameboard.win?
         return "YOU LOSE!!"
     end
@@ -131,5 +154,17 @@ class Game
         input = gets.chomp.split(",")
         [input[0].to_i,input[1].to_i]
     end
+
+    def save_game
+      File.open("save_game.txt", "w") do |file|
+        file.puts @gameboard.to_yaml
+      end
+    end
+end
+
+
+if __FILE__ == $PROGRAM_NAME
+  g = Game.new
+  g.run
 
 end

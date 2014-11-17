@@ -1,0 +1,38 @@
+--- !ruby/object:Board
+board:
+- - !ruby/object:Tile
+    value: "*"
+  - !ruby/object:Tile
+    value: "*"
+  - !ruby/object:Tile
+    value: "*"
+- - !ruby/object:Tile
+    value: "*"
+  - !ruby/object:Tile
+    value: "*"
+  - !ruby/object:Tile
+    value: "*"
+- - !ruby/object:Tile
+    value: "*"
+  - !ruby/object:Tile
+    value: "*"
+  - !ruby/object:Tile
+    value: 3
+size: 3
+bomb_positions:
+- - 2
+  - 1
+- - 1
+  - 1
+- - 0
+  - 2
+- - 1
+  - 2
+- - 0
+  - 0
+- - 1
+  - 0
+remaining_tiles: 8
+checked_tiles:
+- - 2
+  - 2
