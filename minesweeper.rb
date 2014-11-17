@@ -123,6 +123,7 @@ class Game
       else
         yaml_str = File.read(ARGV.last).to_s
         @gameboard = YAML::load(yaml_str)
+        ARGV.shift
       end
     end
 
@@ -132,7 +133,7 @@ class Game
         until @gameboard.win?
           @gameboard.display
           puts "Reveal, flag, or save?(r/f/s)"
-          type = gets.chomp
+          type = get_type
           puts "Please select a tile in the format
           [0..#{@gameboard.size-1},0..#{@gameboard.size-1}]" unless type == "s"
           input = get_move unless type == "s"
@@ -146,13 +147,27 @@ class Game
           end
         end
         @gameboard.display
-        return "YOU WIN!!!" if @gameboard.win?
-        return "YOU LOSE!!"
+        if @gameboard.win?
+          puts "YOU WIN!!!"
+        else
+          puts "YOU LOSE!!"
+        end
     end
 
     def get_move
-        input = gets.chomp.split(",")
-        [input[0].to_i,input[1].to_i]
+        begin
+          input = gets.chomp.split(",")
+          x = input[0].to_i
+          y = input[1].to_i
+        end until x.between?(0,@gameboard.size-1) && y.between?(0,@gameboard.size-1)
+        [x,y]
+    end
+
+    def get_type
+      begin
+        input = gets.chomp
+      end until ["r", "f", "s"].include?(input)
+      input
     end
 
     def save_game
