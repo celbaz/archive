@@ -21,7 +21,7 @@ class Board
         @board = Array.new(size)  {Array.new(size){Tile.new}}
         @size = size
         @bomb_positions = spawn_bombs(bombs)
-        @remaining_tiles = size*size
+        @remaining_tiles = size * size
         @checked_tiles = []
     end
 
@@ -47,7 +47,7 @@ class Board
     end
 
     def reveal_tile(coords)
-      return nil if bomb_here?(coords)
+      return false if bomb_here?(coords)
       queue = [coords]
       until queue.empty?
         curr_coord = queue.pop
@@ -60,7 +60,6 @@ class Board
           queue += current_neighbors
           self[curr_coord].set("X")
         else
-          # puts "#{current_bomb_count} BC"
           self[curr_coord].set(current_bomb_count)
         end
       end
@@ -100,6 +99,7 @@ class Board
     def bomb_here?(coords)
       @bomb_positions.include?(coords)
     end
+
     attr_reader :bomb_positions, :size
 
     def [](co)
@@ -114,6 +114,10 @@ class Board
       self[coords].flag
     end
 
+    def valid_position?(x,y)
+
+    end
+
 end
 
 class Game
@@ -121,9 +125,8 @@ class Game
       if ARGV.empty?
         @gameboard = Board.new(size,bombs)
       else
-        yaml_str = File.read(ARGV.last).to_s
+        yaml_str = File.read(ARGV.shift).to_s
         @gameboard = YAML::load(yaml_str)
-        ARGV.shift
       end
     end
 
@@ -138,7 +141,7 @@ class Game
           [0..#{@gameboard.size-1},0..#{@gameboard.size-1}]" unless type == "s"
           input = get_move unless type == "s"
           if type == "r"
-            break if @gameboard.reveal_tile(input).nil?
+            break unless @gameboard.reveal_tile(input)
           elsif type == 'f'
             @gameboard.flag_tile(input)
           else
@@ -157,8 +160,8 @@ class Game
     def get_move
         begin
           input = gets.chomp.split(",")
-          x = input[0].to_i
-          y = input[1].to_i
+          x = Integer(input[0])
+          y = Integer(input[1])
         end until x.between?(0,@gameboard.size-1) && y.between?(0,@gameboard.size-1)
         [x,y]
     end
@@ -171,10 +174,11 @@ class Game
     end
 
     def save_game
-      File.open("save_game.txt", "w") do |file|
+      File.open("save_game.yml", "w") do |file|
         file.puts @gameboard.to_yaml
       end
     end
+
 end
 
 
