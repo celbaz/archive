@@ -59,6 +59,15 @@ class Board
   end
 
   def move(start,end_pos)
-
+    i,j = start
+    piece = board[i][j]
+    raise ArgumentError.new "wrong start coord" if piece.nil?
+    possible = piece.move
+    if possible.include?(end_pos)
+      board[end_pos[0]][end_pos[1]] = piece
+      board[i][j] = nil
+    else
+      raise ArgumentError.new "can't reach the end_pos"
+    end
   end
 end
