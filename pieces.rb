@@ -85,7 +85,7 @@ class SteppingPiece < Piece
         new_move[0] = shift[0] + coord[0]
         new_move[1] = shift[1] + coord[1]
         if new_move[0].between?(0,7) && new_move[1].between?(0,7)
-        
+
           if @board.board[new_move[0]][new_move[1]].nil?
               result << new_move
           elsif @board.board[new_move[0]][new_move[1]].color != self.color
@@ -94,6 +94,14 @@ class SteppingPiece < Piece
         end
       end
       result
+    end
+
+    def valid_moves(coord)
+        result = move
+        result.each do |el|
+          result.delete(el) if @board.in_check?(self.color,coord)
+        end
+        result
     end
 
 end

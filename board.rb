@@ -54,8 +54,8 @@ class Board
       puts "  01234567"
   end
 
-  def in_check?(color)
-    king_pos = find_king(color)
+  def in_check?(color, coord = find_king(color))
+    king_pos = coord
     queue = []
     i, j = king_pos
     neighbor_king = @board[i][j].move

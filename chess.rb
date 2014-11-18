@@ -10,6 +10,11 @@ class Game
 
   def run
     play_turn
+
+      #user chooses a piece
+      #we return all valid moves
+      #picks a move
+      #else choose a new piece
     rescue e
       retry play_turn
     end
