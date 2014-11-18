@@ -1,15 +1,15 @@
 class Piece
-  def initialize(type, board, color)
-    @board = board
-    @coord = nil
+  def initialize(type, board, color, coord)#coord
+    @coord = coord
     @color = color
     @type = type
+    @board = board
   end
-  attr_reader :type
+  attr_reader :type, :color, :coord
 
-  def coord=(coord)
-      @coord = coord
-  end
+  # def coord=(coord)
+  #     @coord = coord
+  # end
 
   def move
   end
@@ -24,8 +24,8 @@ end
 class SlidingPiece < Piece
   DIAG = [[-1, -1], [-1, 1], [1, -1], [1, 1]]
   UPDOWN = [[0, 1], [0, -1], [1, 0], [-1, 0]]
-    def initialize(type, board, color)
-        super(type, board, color)
+    def initialize(type, board, color, coord)
+        super(type, board, color, coord)
         @type = type
     end
 
@@ -67,8 +67,8 @@ end
 class SteppingPiece < Piece
     KNIGHT = [[-2,-1],[-1,-2],[-2,1], [2,-1],[-1,2],[2,1],[1,2],[1,-2]]
     KING = [[0,1] ,[0,-1], [1,0],[-1,0], [1,-1],[-1,1], [1,1], [-1,-1]]
-    def initialize(type, board, color)
-        super(type, board, color)
+    def initialize(type, board, color, coord)
+        super(type, board, color, coord)
         @type = type
     end
 
@@ -80,11 +80,17 @@ class SteppingPiece < Piece
     def slide_move(const)
       result = []
       count = 0
-      CONST.each do |shift|
+      new_move = []
+      const.each do |shift|
         new_move[0] = shift[0] + coord[0]
         new_move[1] = shift[1] + coord[1]
         if new_move[0].between?(0,7) && new_move[1].between?(0,7)
-          result << new_move unless board[coord].color == result.last.color
+        
+          if @board.board[new_move[0]][new_move[1]].nil?
+              result << new_move
+          elsif @board.board[new_move[0]][new_move[1]].color != self.color
+            result << new_move
+          end
         end
       end
       result
@@ -93,8 +99,8 @@ class SteppingPiece < Piece
 end
 
 class Pawn < Piece
-  def initialize(type, color, board)
-    super(type, board, color)
+  def initialize(type, color, board, coord)
+    super(type, board, color, coord)
     @first_move = true
     @type = type
   end
@@ -108,7 +114,7 @@ class Pawn < Piece
 
     (0..1).each do |i|
       new_move = [coord[0] + move_up[i][0], coord[1] + move_up[i][1]]
-      result << new_move if board[coord] == nil
+      result << new_move if @board.board[coord[0]][coord[1]] == nil
     end
 
     move_up.shift  if @first_move
@@ -116,7 +122,9 @@ class Pawn < Piece
 
     (0..1).each do |i|
       new_move = [coord[0] + move_dia[i][0], coord[1] + move_dia[i][1]]
-      result << new_move if opponent_color?
+      unless new_move.nil?
+        result << new_move if color != new_move.color
+      end
     end
 
   end
