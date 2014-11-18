@@ -1,8 +1,14 @@
 class Piece
-  def initialize(board,coord)
+  def initialize(type, board, color)
     @board = board
-    @coord = coord
-    @color = 'gray'
+    @coord = nil
+    @color = color
+    @type = type
+  end
+  attr_reader :type
+
+  def coord=(coord)
+      @coord = coord
   end
 
   def move
@@ -18,8 +24,8 @@ end
 class SlidingPiece < Piece
   DIAG = [[-1, -1], [-1, 1], [1, -1], [1, 1]]
   UPDOWN = [[0, 1], [0, -1], [1, 0], [-1, 0]]
-    def initialize(type, board)
-        super(board)
+    def initialize(type, board, color)
+        super(type, board, color)
         @type = type
     end
 
@@ -61,8 +67,8 @@ end
 class SteppingPiece < Piece
     KNIGHT = [[-2,-1],[-1,-2],[-2,1], [2,-1],[-1,2],[2,1],[1,2],[1,-2]]
     KING = [[0,1] ,[0,-1], [1,0],[-1,0], [1,-1],[-1,1], [1,1], [-1,-1]]
-    def initialize(type, board)
-        super(board)
+    def initialize(type, board, color)
+        super(type, board, color)
         @type = type
     end
 
@@ -87,9 +93,10 @@ class SteppingPiece < Piece
 end
 
 class Pawn < Piece
-  def initialize(type, board)
-    super(board)
+  def initialize(type, color, board)
+    super(type, board, color)
     @first_move = true
+    @type = type
   end
 
   def move
@@ -101,7 +108,7 @@ class Pawn < Piece
 
     (0..1).each do |i|
       new_move = [coord[0] + move_up[i][0], coord[1] + move_up[i][1]]
-      result << new_move if board[coord].color == 'gray'
+      result << new_move if board[coord] == nil
     end
 
     move_up.shift  if @first_move
