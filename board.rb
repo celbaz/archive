@@ -90,6 +90,11 @@ class Board
     false
   end
 
+  def check_mate?(color)
+      k = find_king(color)
+      return @board[k[0]][k[1]].valid_moves(k).empty? && in_check?(color,k)
+  end
+
   def find_king(color)
     (0...8).each do |i|
       (0...8).each do |j|
@@ -102,7 +107,7 @@ class Board
 
   def move(start,end_pos)
     i,j = start
-    piece = board[i][j]
+    piece = board[i.to_i][j.to_i]
     raise ArgumentError.new "wrong start coord" if piece.nil?
     possible = piece.move
     if possible.include?(end_pos)

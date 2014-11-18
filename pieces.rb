@@ -96,7 +96,7 @@ class SteppingPiece < Piece
       result
     end
 
-    def valid_moves(coord)
+    def valid_moves(coord) #check again upon implemetning game
         result = move
         result.each do |el|
           result.delete(el) if @board.in_check?(self.color,coord)
@@ -131,7 +131,7 @@ class Pawn < Piece
     (0..1).each do |i|
       new_move = [coord[0] + move_dia[i][0], coord[1] + move_dia[i][1]]
       unless new_move.nil?
-        result << new_move if color != new_move.color
+        result << new_move if @color != @board.board[new_move[0]][new_move[1]].color
       end
     end
 
