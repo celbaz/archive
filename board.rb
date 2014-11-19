@@ -61,9 +61,9 @@ class Board
 
   def display
     count = 0
-        puts "  - - - - - - - -"
+        puts "    - - - - - - - -"
       @board.each do |row|
-        string ="#{count}|"
+        string ="#{count}| "
         c = nil
         row.each do |el|
           if el.nil?
@@ -90,12 +90,12 @@ class Board
         unless c.nil?
             p string + "|"
           else
-             p string
+             p string.ljust(19," ")
           end
           count +=1
       end
-      puts "   - - - - - - - -"
-      puts "   0 1 2 3 4 5 6 7"
+      puts "    - - - - - - - -"
+      puts "    0 1 2 3 4 5 6 7"
   end
 
   def in_check?(color, coord = find_king(color))
