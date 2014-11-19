@@ -10,11 +10,15 @@ class Game
 
   def run
     begin
-      break if @board.check_mate?('white')
+      break if @board.check_mate?(:white)
       @board.display
       begin
-        spot = @player1.play_turn
-        @board.move(spot[0],spot[1])
+        input = @player1.play_input
+
+        p @board[input].dup(@board).move
+
+        dest = @player1.play_dest
+        @board.move(input,dest)
 
       rescue ArgumentError => e
         puts "ERROR: #{e.message}"
@@ -22,28 +26,27 @@ class Game
         retry
       end
 
-      break if @board.check_mate?('black')
+      break if @board.check_mate?(:black)
 
       @board.display
       begin
-        spot = @player2.play_turn
-        @board.move(spot[0],spot[1])
+        input = @player2.play_input
+        p @board[input].dup(@board).move
+        dest = @player2.play_dest
+        @board.move(input,dest)
       rescue ArgumentError => e
         puts "ERROR: #{e.message}"
         puts "re-select start point and destination point, player 2"
         retry
       end
     end while true
-        #add player 2 turn
-      #user chooses a piece
-      #we return all valid moves
-      #picks a move
-      #else choose a new piece
-    # end
-    #  rescue e
-    #    retry play_turn
-    #  end
+    if @board.check_mate?(:white)
+      puts "WHITE LOSES!"
+    else
+      puts "BLACK LOSES!"
+    end
   end
+
 
 end
 
@@ -56,27 +59,26 @@ end
 
 class HumanPlayer < Player
 
-    def play_turn
-        puts "Please Select a piece to move.(format: 12)"
-        #input =  gets.chomp.split("")
+    def play_input
+      puts "Please Select a piece to move.(format: 12)"
+      input = gets.chomp
+      pos_start = []
+      input.split('').each do |i|
+        pos_start << Integer(i)
+      end
 
-        input = gets.chomp
-        pos_start = []
-        input.split('').each do |i|
-          pos_start << Integer(i)
-        end
+      pos_start
+    end
 
-        #input.map { |e|  e.to_i }
-        puts "Select destination. (format: 12)"
-        # dest =  gets.chomp.split("")
+    def play_dest
+      puts "Select destination. (format: 12)"
 
-        input = gets.chomp
-        pos_dest = []
-        input.split('').each do |i|
-          pos_dest << Integer(i)
-        end
-        #dest.map { |e|  e.to_i }
-        return [pos_start, pos_dest]
+      input = gets.chomp
+      pos_dest = []
+      input.split('').each do |i|
+        pos_dest << Integer(i)
+      end
+      pos_dest
     end
 
 

@@ -44,23 +44,22 @@ class SlidingPiece < Piece
     def slide_move(const)
       result = []
       count = 0
-      puts coord
       tmp_coord = coord.dup
-      tmp_color = @board[tmp_coord].color
+      tmp_color = @board.board[tmp_coord[0]][tmp_coord[1]].color
       while count < 4
         new_move = coord.dup
-        p "new_move #{new_move}"
+        # p "new_move #{new_move}"
         new_move[0] = new_move[0] + const[count][0]
         new_move[1] = new_move[1] + const[count][1]
-         p "count #{count} new_move #{new_move} const #{const[count]}"
+        # p "count #{count} new_move #{new_move} const #{const[count]}"
         while new_move[0].between?(0,7) && new_move[1].between?(0,7)
-          if @board[new_move].nil?
+          if @board.board[new_move[0]][new_move[1]].nil?
             result << new_move.dup
             # p result
             new_move[0] += const[count][0]
             new_move[1] += const[count][1]
           else
-            result << new_move.dup if tmp_color != @board[new_move].color
+            result << new_move.dup if tmp_color != @board.board[new_move[0]][new_move[1]].color
             break
           end
         end
@@ -92,10 +91,10 @@ class SteppingPiece < Piece
         new_move[1] = shift[1] + coord[1]
         if new_move[0].between?(0,7) && new_move[1].between?(0,7)
 
-          if @board[new_move].nil?
-              result << new_move.dup
-          elsif @board[new_move].color != self.color
-            result << new_move.dup
+          if @board.board[new_move[0]][new_move[1]].nil?
+              result << new_move
+          elsif @board.board[new_move[0]][new_move[1]].color != self.color
+            result << new_move
           end
         end
       end
@@ -128,21 +127,22 @@ class Pawn < Piece
     move_up_b = [[2,0], [1,0]]
 
 
-     @color == :white ? move_up = move_up_w : move_up = move_up_b
+     @color == 'white' ? move_up = move_up_w : move_up = move_up_b
      move_up.shift  unless @first_move
      @first_move = false
       move_up.size.times do |i|
-
+        #p "#{i} #{@coord}"
         new_move = [@coord[0] + move_up[i][0], @coord[1] + move_up[i][1]]
-
+        #p new_move
         result << new_move if @board[new_move].nil?
       end
+      p "UPMOVES: #{result}"
 
-      @color == :white ? move_dia = move_dia_w : move_dia = move_dia_b
+      @color == 'white' ? move_dia = move_dia_w : move_dia = move_dia_b
       (0..1).each do |i|
         new_move = [@coord[0] + move_dia[i][0], @coord[1] + move_dia[i][1]]
-        unless @board[new_move].nil?
-          result << new_move if @color != @board[new_move].color
+        unless @board.board[new_move[0]][new_move[1]].nil?
+          result << new_move if @color != @board.board[new_move[0]][new_move[1]].color
         end
       end
     result
