@@ -5,11 +5,7 @@ class Piece
     @type = type
     @board = board
   end
-  attr_reader :type, :color, :coord
-
-  # def coord=(coord)
-  #     @coord = coord
-  # end
+  attr_accessor :type, :color, :coord
 
   def move
   end
@@ -111,29 +107,53 @@ class Pawn < Piece
     super(type, board, color, coord)
     @first_move = true
     @type = type
+    # @move_dia = [[-1, 1], [1, 1]]
+    # @move_up = [[2,0], [1,0]]
+    #white_move
   end
 
+  #
+  # def white_move
+  #     if @color == "white"
+  #       @move_dia.each_index do |i|
+  #           (0..1).each do |j|
+  #             @move_dia[i][j] *= -1
+  #           end
+  #       end
+  #       @move_up.each_index do |i|
+  #           (0..1).each do |j|
+  #             @move_up[i][j] *= -1
+  #           end
+  #       end
+  #     end
+  # end
   def move
-    move_dia = [[-1, 1], [1, 1]]
-    move_up = [[0, 2], [0, 1]]
-
-
     result = []
 
-    (0..1).each do |i|
-      new_move = [coord[0] + move_up[i][0], coord[1] + move_up[i][1]]
-      result << new_move if @board.board[coord[0]][coord[1]] == nil
-    end
+    move_dia_w = [[-1, -1], [1, -1]]
+    move_up_w = [[ -2,0], [-1, 0]]
+    move_dia_b = [[1, -1], [1, 1]]
+    move_up_b = [[2,0], [1,0]]
 
-    move_up.shift  if @first_move
-    @first_move = false
 
-    (0..1).each do |i|
-      new_move = [coord[0] + move_dia[i][0], coord[1] + move_dia[i][1]]
-      unless new_move.nil?
-        result << new_move if @color != @board.board[new_move[0]][new_move[1]].color
+     @color == 'white' ? move_up = move_up_w : move_up = move_up_b
+     move_up.shift  unless @first_move
+     @first_move = false
+      move_up.size.times do |i|
+        p "#{i} #{@coord}"
+        new_move = [@coord[0] + move_up[i][0], @coord[1] + move_up[i][1]]
+        p new_move
+        result << new_move if @board.board[new_move[0]][new_move[1]].nil?
       end
-    end
+      p "UPMOVES: #{result}"
 
+      @color == 'white' ? move_dia = move_dia_w : move_dia = move_dia_b
+      (0..1).each do |i|
+        new_move = [@coord[0] + move_dia[i][0], @coord[1] + move_dia[i][1]]
+        unless @board.board[new_move[0]][new_move[1]].nil?
+          result << new_move if @color != @board.board[new_move[0]][new_move[1]].color
+        end
+      end
+    result
   end
 end

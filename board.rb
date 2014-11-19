@@ -11,10 +11,10 @@ class Board
     [0, 2].each do |i|
         type = "RNB"
       [0, 2].each do |j|
-          @board[0][j] = SlidingPiece.new(type[i], self, 'black', [0, j])
-          @board[0][-1 - j] = SlidingPiece.new(type[i], self, 'black', [0, -1 - j])
-          @board[7][j] = SlidingPiece.new(type[i], self, 'white', [7, j])
-          @board[7][-1 -j] = SlidingPiece.new(type[i], self, 'white', [7, -1 - j])
+          @board[0][j] = SlidingPiece.new(type[j], self, 'black', [0, j])
+          @board[0][-1 - j] = SlidingPiece.new(type[j], self, 'black', [0, -1 - j])
+          @board[7][j] = SlidingPiece.new(type[j], self, 'white', [7, j])
+          @board[7][-1 -j] = SlidingPiece.new(type[j], self, 'white', [7, -1 - j])
       end
     end
 
@@ -63,34 +63,21 @@ class Board
       row, col = neighbor
       current_piece = @board[row][col]
       if current_piece.nil?
-         queue << current_piece
+        #check a spot in advance
+        @tmp_board = @board.deep_dup
+        @tmp_board[row][col] = @tmp_board[king_pos[0]][king_pos[1]]
+        curr_neighbors = @tmp_board[row][col].move
+        curr_neighbors.delete(@tmp_board[king_pos[0]][king_pos[1]])
+        return false if curr_neighbors.any? {|v| v.nil?}
       elsif current_piece.color != color
-         return true if move_possible?([row, col],king_pos)
+         return true if current_piece.move_possible?([row, col],king_pos)
       end
-    end
-
-    until queue.empty?
-        dir = queue.shift
-        dir[0], dir[1] = dir[0] - king_pos[0], dir[1] - king_pos[1]
-        next_tile = king_pos
-        begin
-          next_tile[0] += dir[0]
-          next_tile[1] += dir[1]
-          unless @board[next_tile[0]][next_tile[1]].nil?
-              if @board[next_tile[0]][next_tile[1]].color != color
-                return true if move_possible?(next_tile, king_pos)
-              end
-                break
-          end
-        #if next_tile not my color then check if move possible else break
-        end until next_tile[0].between?(0,7) && next_tile[1].between?(0,7)
-
-
     end
     false
   end
 
   def check_mate?(color)
+      puts "Hello!"
       k = find_king(color)
       return @board[k[0]][k[1]].valid_moves(k).empty? && in_check?(color,k)
   end
@@ -107,12 +94,16 @@ class Board
 
   def move(start,end_pos)
     i,j = start
-    piece = board[i.to_i][j.to_i]
+    piece = board[i][j]
     raise ArgumentError.new "wrong start coord" if piece.nil?
     possible = piece.move
-    if possible.include?(end_pos)
-      board[end_pos[0]][end_pos[1]] = piece
-      board[i][j] = nil
+    # p possible
+    k,l = end_pos
+
+    if possible.include?([k,l])
+      @board[k][l] = piece
+      @board[k][l].coord = [k, l]
+      @board[i][j] = nil
     else
       raise ArgumentError.new "can't reach the end_pos"
     end
@@ -123,5 +114,18 @@ class Board
     piece = board[i][j]
     possible = piece.move
     possible.include?(end_pos)
+  end
+end
+
+class Array
+  def deep_dup
+    # Argh! Mario and Kriti beat me with a one line version?? Must
+    # have used `inject`...
+
+    [].tap do |new_array|
+      self.each do |el|
+        new_array << (el.is_a?(Array) ? el.deep_dup : el)
+      end
+    end
   end
 end
