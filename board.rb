@@ -19,46 +19,57 @@ class Board
   end
 
   def display # add colorized board
-    @grid.each_with_index do |row, i|
-      string = "#{i} |"
-      row.each do |spot|
-          string += spot.nil? ? " " : spot.print
-          string += "|"
+    i = 9
+    until i < 0
+      row = @grid[i]
+      string = "#{i} "
+      shift = (i % 2 == 0) ? 0 : 1
+      row.each_with_index do |spot, j|
+          string += spot.nil? ? "   " : spot.print
+          colour  = (j % 2 == shift) ? :red : :light_blue
+          string[-3..-1] = string[-3..-1].colorize( :background => colour)
       end
-      puts "  _____________________"
+      i -=1
       puts string
     end
-    puts "  _____________________"
+    puts "   0  1  2  3  4  5  6  7  8  9"
   end
 
   def [](pos)
-    raise "You have a [] error" unless valid_input?(pos)
+    raise BoardError.new "You have a [] error" unless valid_input?(pos)
 
     x,y = pos
     @grid[x][y]
   end
 
   def []=(pos, piece)
-    raise "You have a []= error" unless valid_input?(pos)
+    raise BoardError.new "You have a []= error" unless valid_input?(pos)
 
     x,y = pos
     @grid[x][y] = piece
   end
 
-  def valid_input?(pos) #FIX LATER
-    # if pos.size == 2 && pos.all? {|c| c.is_a?(Integer) && c.between(0,9)}
+  def valid_input?(pos)
+    if pos.size == 2 && pos.all? { |c| c.is_a?(Fixnum) && c.between?(0,9)}
       return true
-  #   else
-  #     return false
-  #   end
+    else
+      return false
+    end
   end
 
   def dup
-    result = self.new(false)
-
+    result = self.class.new(false)
     @grid.flatten.compact.each do |piece|
-        result.grid[piece.pos] = piece.dup(result)
+        result[piece.pos] = piece.dup(result)
     end
     result
   end
+
+  def pieces_left(color)
+    @grid.flatten.compact.select.count { |piece| piece.color == color }
+  end
+end
+
+class BoardError < StandardError
+
 end
