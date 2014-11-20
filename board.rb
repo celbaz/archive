@@ -1,4 +1,5 @@
 require_relative 'piece.rb'
+require 'colorize'
 
 class Board
   def initialize(set = true)
@@ -17,7 +18,7 @@ class Board
     end
   end
 
-  def display
+  def display # add colorized board
     @grid.each_with_index do |row, i|
       string = "#{i} |"
       row.each do |spot|
@@ -52,4 +53,12 @@ class Board
   #   end
   end
 
+  def dup
+    result = self.new(false)
+
+    @grid.flatten.compact.each do |piece|
+        result.grid[piece.pos] = piece.dup(result)
+    end
+    result
+  end
 end

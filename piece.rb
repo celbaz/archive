@@ -1,5 +1,5 @@
 class Piece
-  attr_reader :print
+  attr_reader :print, :pos
   def initialize(pos, color, board)
     @board = board
     @promoted = false
@@ -18,8 +18,9 @@ class Piece
       @pos = end_pos
       @board[end_pos] = self
       promote?
+      return true
     else
-      raise "Move is not possible."
+      return false
     end
   end
 
@@ -62,7 +63,6 @@ class Piece
     result
   end
 
-
   def perform_jump(end_pos)
     if moves_possible_j.include?(end_pos)
       shift = []
@@ -78,6 +78,38 @@ class Piece
     end
   end
 
+  def perform_moves!(move_sequence)
+    if valid_move_seq?
+      if move_sequence.size == 1
+        unless perform_slide(move_sequence.first)
+          perform_jump(move_sequence.first)
+        end
+      elsif move_sequence.size > 1
+        move_sequence.each do |m|
+          perform_jump(m)
+      end
+    end
+  end
+
+  def valid_move_seq?(move_sequence)
+    begin
+      new_board = @board.dup
+
+      if move_sequence.size == 1
+        unless new_board[@pos].perform_slide(move_sequence.first)
+          new_board[@pos].perform_jump(move_sequence.first)
+        end
+      elsif move_sequence.size > 1
+        new_board[@pos].move_sequence.each do |m|
+          new_board[@pos].perform_jump(m)
+        end
+      end
+    rescue
+      return false
+    end
+    return true
+  end
+
   def promote?
     return nil if @promoted
     if (@color == :black && pos[1] == 0) ||
@@ -85,5 +117,9 @@ class Piece
       @print = (@color == :white) ? '♔' : '♚'
       @promoted = true
     end
+  end
+
+  def dup(board)
+    self.class.new(@pos.dup, @color, board)
   end
 end
