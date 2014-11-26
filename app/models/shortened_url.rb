@@ -3,7 +3,7 @@ class ShortenedUrl < ActiveRecord::Base
 
   validates :long_url, presence: true, uniqueness: true, length: {maximum: 1024}
   validates :short_url, presence: true, uniqueness: true
-  validates :no_more_than_five_urls_per_minute
+  validate :no_more_than_five_urls_per_minute
 
   belongs_to :submitter,
     class_name: "User",
@@ -17,6 +17,7 @@ class ShortenedUrl < ActiveRecord::Base
 
   has_many :visitors, -> { distinct}, through: :visits, source: :visitor
   has_many :tags, through: :taggings, source: :tag
+
   def self.random_code
     begin
       code = SecureRandom::urlsafe_base64
@@ -44,9 +45,12 @@ class ShortenedUrl < ActiveRecord::Base
   private
 
   def no_more_than_five_urls_per_minute
-    num = Visit.select(:visitor_id).where(url_id: id, created_at: 1.minute.ago..Time.now).count
+    user = User.find(user_id)
+    num = user.submitted_urls.where(created_at: 1.minute.ago..Time.now).count
+
     if num > 5
-      errors[:shortened_url] << "can't make more than 5 urls per minute"
+      errors[:base] << "can't make more than 5 urls per minute"
+    end
   end
 
 end
