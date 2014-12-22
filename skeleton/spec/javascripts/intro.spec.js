@@ -35,10 +35,10 @@ describe("listPokemon", function() {
 //  pokedex.listPokemon(pokes, function() {});
 //  expect(eventSpy.calledOnce).toBeTruthy();
 //});
-  
+
   it("fetches the passed-in collection", function() {
     var pokedex = new Pokedex($('<div>'));
-    
+
     this.server = sinon.fakeServer.create();
     pokedex.listPokemon(function() {});
 
@@ -51,7 +51,7 @@ describe("listPokemon", function() {
   });
 
   it("fills the passed-in collection", function() {
-    
+
     var pokedex = new Pokedex($('<div>'));
 
     this.fixture = this.fixtures.Pokemon.index.response;
@@ -89,7 +89,7 @@ describe("listPokemon", function() {
           JSON.stringify(this.fixture)
         ]
       );
-      
+
       var that = this;
       this.pokedex.listPokemon(function() {
         that.called = true;
@@ -105,7 +105,7 @@ describe("listPokemon", function() {
       expect(this.called).toBeTruthy();
     });
 
-    it("waits to call the callback until the collection has been filled", 
+    it("waits to call the callback until the collection has been filled",
           function() {
 
       expect(this.called).toBeFalsy();
@@ -127,11 +127,11 @@ describe("createPokemon", function() {
   afterEach(function() {
     this.server.restore();
   });
-  
+
   it("returns a Pokemon model", function() {
     var poke = this.pokedex.createPokemon();
     expect(poke.__proto__).toEqual(Pokedex.Models.Pokemon.prototype);
-  });  
+  });
 
   it("gives returned model the right attritbutes", function() {
     var poke = this.pokedex.createPokemon({name: "Pikachu", number: 25});
@@ -140,8 +140,8 @@ describe("createPokemon", function() {
   });
 
   it("sends the correct HTTP request to the server", function() {
-    this.pokedex.createPokemon(); 
-    
+    this.pokedex.createPokemon();
+
     expect(this.server.requests.length)
       .toEqual(1);
     expect(this.server.requests[0].method)
@@ -153,10 +153,10 @@ describe("createPokemon", function() {
   it("adds the model to Pokedex collection", function() {
     // do we want to have a global collection defined on Pokedex?
     // e.g., new Pokedex().pokes = new Pokedex.Collections.Pokemon();
-    
+
     // I would like createPokemon to add the model to a collection,
     // so that students can do this with Collection#create, and maybe
-    // experience using {wait: true} 
+    // experience using {wait: true}
     //this.pokedex.createPokemon({ name: "Pikachu", number: 25 });
 
     //this.server.respond();

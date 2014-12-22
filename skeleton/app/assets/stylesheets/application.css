@@ -33,6 +33,10 @@ body {
   height: 100%;
 }
 
+ul {
+  list-style: none;
+}
+
 #pokedex {
 	background-color: white;
 	padding: 10px;
@@ -110,6 +114,8 @@ body {
 }
 
 .detail img {
+  background-color: #3498db;
+  margin: 35px;
   float: left;
   max-width: 300px;
   max-height: 200px;
